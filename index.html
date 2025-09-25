@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Survey Earn</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f6fa;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .balance {
+      font-weight: bold;
+    }
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    input, button, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    textarea {
+      height: 100px;
+    }
+    button {
+      background: #27ae60;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+    button:hover:enabled {
+      background: #219150;
+    }
+    .hidden {
+      display: none;
+    }
+    .survey-btn {
+      background: #2980b9;
+    }
+    .survey-btn:hover:enabled {
+      background: #1f6690;
+    }
+    .note {
+      color: #c0392b;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Signup Page -->
+  <div id="signupPage" class="container">
+    <h2>Create Account</h2>
+    <input type="text" id="signupUser" placeholder="Username" required>
+    <input type="password" id="signupPass" placeholder="Password" required>
+    <button id="signupBtn" onclick="signup()" disabled>Sign Up</button>
+    <a href="link.html"><button onclick="activateSignup()">Link</button></a> <!-- link button -->
+    <p>Already have an account? <a href="#" onclick="showLogin()">Login here</a></p>
+  </div>
+
+  <!-- Login Page -->
+  <div id="loginPage" class="container hidden">
+    <h2>Login</h2>
+    <input type="text" id="loginUser" placeholder="Username" required>
+    <input type="password" id="loginPass" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+    <p>Don’t have an account? <a href="#" onclick="showSignup()">Sign up here</a></p>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="hidden">
+    <header>
+      <h2>Survey Earn</h2>
+      <div class="balance">Balance: ₦<span id="balance">0</span></div>
+    </header>
+    <div class="container">
+      <h3>Welcome, <span id="userDisplay"></span></h3>
+      <p id="surveyNotice">You can answer up to 3 questions daily.</p>
+      <div id="surveySection">
+        <p id="questionText"></p>
+        <textarea id="answerBox" placeholder="Write your answer here..."></textarea>
+        <button class="survey-btn" onclick="submitAnswer()">Submit Answer</button>
+      </div>
+      <p class="note">You can only withdraw when balance is at least ₦1000.</p>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+    const questions = [
+      "What can you advise the Nigerian government to do to enhance Nigerian security?",
+      "Is it really true that the EFCC are doing a great job in Nigeria?",
+      "What do you think every school should work on to improve teaching in Nigeria?"
+    ];
+
+    function activateSignup() {
+      document.getElementById("signupBtn").disabled = false;
+    }
+
+    function showSignup() {
+      document.getElementById("signupPage").classList.remove("hidden");
+      document.getElementById("loginPage").classList.add("hidden");
+    }
+
+    function showLogin() {
+      document.getElementById("loginPage").classList.remove("hidden");
+      document.getElementById("signupPage").classList.add("hidden");
+    }
+
+    function signup() {
+      let user = document.getElementById("signupUser").value.trim();
+      let pass = document.getElementById("signupPass").value.trim();
+
+      if(user === "" || pass === ""){
+        alert("Please fill in all fields");
+        return;
+      }
+
+      if(localStorage.getItem(user)){
+        alert("You already have an account. Please log in.");
+        showLogin(); // redirect to login page
+        return;
+      }
+
+      let account = { 
+        password: pass, 
+        balance: 0, 
+        answeredToday: 0, 
+        lastDate: "", 
+        lockUntil: 0 
+      };
+      localStorage.setItem(user, JSON.stringify(account));
+      alert("Account created successfully!");
+      showLogin();
+    }
+
+    function login() {
+      let user = document.getElementById("loginUser").value.trim();
+      let pass = document.getElementById("loginPass").value.trim();
+
+      let stored = localStorage.getItem(user);
+      if(!stored){
+        alert("Account not found!");
+        return;
+      }
+
+      let account = JSON.parse(stored);
+      if(account.password !== pass){
+        alert("Wrong password!");
+        return;
+      }
+
+      currentUser = user;
+      document.getElementById("userDisplay").textContent = currentUser;
+      updateDashboard();
+      document.getElementById("dashboard").classList.remove("hidden");
+      document.getElementById("loginPage").classList.add("hidden");
+    }
+
+    function updateDashboard() {
+      let account = JSON.parse(localStorage.getItem(currentUser));
+      document.getElementById("balance").textContent = account.balance;
+
+      let now = Date.now();
+      if(now < account.lockUntil) {
+        let remaining = Math.ceil((account.lockUntil - now) / (1000*60*60));
+        document.getElementById("surveyNotice").textContent = 
+          "You have finished today's surveys. Please come back in " + remaining + " hours.";
+        document.getElementById("surveySection").classList.add("hidden");
+      } else {
+        document.getElementById("surveySection").classList.remove("hidden");
+        if(account.answeredToday < 3) {
+          document.getElementById("surveyNotice").textContent = 
+            "You can answer up to 3 questions daily.";
+          document.getElementById("questionText").textContent = 
+            questions[account.answeredToday];
+        } else {
+          account.lockUntil = now + 24*60*60*1000;
+          localStorage.setItem(currentUser, JSON.stringify(account));
+          updateDashboard();
+        }
+      }
+    }
+
+    function submitAnswer() {
+      let answer = document.getElementById("answerBox").value.trim();
+      if(answer === ""){
+        alert("Please write an answer before submitting.");
+        return;
+      }
+
+      let account = JSON.parse(localStorage.getItem(currentUser));
+      account.balance += 100;
+      account.answeredToday += 1;
+      account.lastDate = new Date().toDateString();
+      localStorage.setItem(currentUser, JSON.stringify(account));
+      document.getElementById("answerBox").value = "";
+      alert("Answer submitted! You earned ₦100. Balance: ₦" + account.balance);
+      updateDashboard();
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById("dashboard").classList.add("hidden");
+      showLogin();
+    }
+  </script>
+</body>
+</html>
